@@ -1,3 +1,4 @@
+import { PLACEHOLDER_IMG } from '@/lib/placeholder';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { cookies } from 'next/headers';
@@ -92,7 +93,7 @@ export default async function OrderDetailPage({ params }: Props) {
             >
               <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 relative shrink-0">
                 <Image
-                  src={item.image || '/placeholder.jpg'}
+                  src={item.image || PLACEHOLDER_IMG}
                   alt={item.name}
                   fill
                   className="object-cover"

@@ -2,7 +2,7 @@ import { revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/guards';
 import { getResource, RESOURCE_POPULATE, escapeRegex } from '@/lib/admin-resources.server';
-import { sanitizeFields, slugify } from '@/lib/listings';
+import { sanitizeFields, slugify, autoCategory } from '@/lib/listings';
 import { logAdminAction } from '@/services/audit.service';
 
 type Ctx = { params: Promise<{ resource: string }> };
@@ -39,8 +39,9 @@ export async function POST(req: NextRequest, { params }: Ctx) {
   const { data, error } = sanitizeFields(r.cfg.fields, body);
   if (error || !data) return NextResponse.json({ success: false, error }, { status: 400 });
 
+  if (key === 'services' || key === 'tourism') await autoCategory(key === 'services' ? 'service' : 'tourism', data);
   const extra: Record<string, unknown> = {};
-  if (r.cfg.slugFrom) extra.slug = slugify(String(data[r.cfg.slugFrom]), key !== 'categories');
+  if (r.cfg.slugFrom) extra.slug = slugify(String(data[r.cfg.slugFrom]), !['categories', 'taxonomies'].includes(key));
   if (['restaurants', 'services', 'tourism'].includes(key)) Object.assign(extra, { status: 'approved', isActive: true });
   if (key === 'events') extra.status = 'published';
   if (key === 'culture') extra.publishedAt = new Date();
@@ -49,6 +50,7 @@ export async function POST(req: NextRequest, { params }: Ctx) {
   try {
     const doc = await r.model.create({ ...data, ...extra });
     if (key === 'banners') revalidateTag('site-config');
+    if (key === 'taxonomies' || key === 'categories') revalidateTag('taxonomy');
     await logAdminAction({ adminId: auth.user.userId, action: `${key}.create`, modelType: key, modelId: String(doc._id) });
     return NextResponse.json({ success: true, data: doc }, { status: 201 });
   } catch (e) {

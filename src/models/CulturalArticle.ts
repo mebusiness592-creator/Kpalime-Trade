@@ -23,7 +23,7 @@ const schema = new Schema<ICulturalArticle>(
     coverImage: { type: String },
     category: {
       type: String,
-      enum: ['histoire', 'tradition', 'patrimoine', 'musique', 'danse', 'gastronomie', 'autre'],
+      default: 'autre',
       required: true,
     },
     author: { type: String },

@@ -30,7 +30,7 @@ const schema = new Schema<IEvent>(
     description: { type: String, required: true },
     category: {
       type: String,
-      enum: ['concert', 'festival', 'exposition', 'conference', 'sport', 'culturel', 'marche', 'autre'],
+      default: 'autre',
       required: true,
     },
     poster: { type: String },

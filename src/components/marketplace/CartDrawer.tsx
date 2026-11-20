@@ -1,5 +1,7 @@
 'use client';
 
+import { PLACEHOLDER_IMG } from '@/lib/placeholder';
+
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -38,7 +40,7 @@ export function CartDrawer() {
                 items.map((item) => (
                   <div key={item.productId} className="flex gap-3">
                     <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 shrink-0 relative">
-                      <Image src={item.image || '/placeholder.jpg'} alt={item.name} fill className="object-cover" sizes="64px" />
+                      <Image src={item.image || PLACEHOLDER_IMG} alt={item.name} fill className="object-cover" sizes="64px" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{item.name}</p>

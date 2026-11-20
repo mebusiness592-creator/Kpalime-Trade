@@ -1,5 +1,7 @@
 'use client';
 
+import { PLACEHOLDER_IMG } from '@/lib/placeholder';
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
@@ -87,7 +89,7 @@ export default function CheckoutPage() {
           {items.map((item) => (
             <div key={item.productId} className="flex gap-3 py-2 border-b border-gray-50 last:border-0">
               <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 relative shrink-0">
-                <Image src={item.image || '/placeholder.jpg'} alt="" fill className="object-cover" sizes="40px" />
+                <Image src={item.image || PLACEHOLDER_IMG} alt="" fill className="object-cover" sizes="40px" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{item.name}</p>

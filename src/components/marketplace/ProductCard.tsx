@@ -1,3 +1,4 @@
+import { PLACEHOLDER_IMG } from '@/lib/placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Price } from '@/components/currency/Price';
@@ -16,7 +17,7 @@ interface Props {
 }
 
 export function ProductCard({ product }: Props) {
-  const imageUrl = product.images[0]?.secure_url || '/placeholder.jpg';
+  const imageUrl = product.images[0]?.secure_url || PLACEHOLDER_IMG;
   const displayPrice = product.discountPrice || product.price;
 
   return (

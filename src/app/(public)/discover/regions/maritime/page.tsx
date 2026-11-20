@@ -39,19 +39,17 @@ const GALLERY_KEYS = ['region.maritime.banner', 'region.maritime.lome', 'region.
 
 export default async function MaritimeRegionPage() {
   const imageMap = await getSiteImageMap();
-  const banner = imageMap['region.maritime.banner']?.url || MARITIME_REGION.banner;
-  const gallery = MARITIME_REGION.gallery.map((fallback, i) => imageMap[GALLERY_KEYS[i]]?.url || fallback);
+  const banner = imageMap['region.maritime.banner']?.url;
+  const gallery = GALLERY_KEYS.map((k) => imageMap[k]?.url).filter(Boolean) as string[];
   return (
     <div className="bg-night min-h-screen">
       {/* BANNIÈRE HERO */}
       <section className="relative h-[500px] md:h-[600px] overflow-hidden">
-        <Image
-          src={banner}
-          alt="Plage de la Région Maritime au coucher du soleil"
-          fill
-          className="object-cover"
-          priority
-        />
+        {banner ? (
+          <Image src={banner} alt="Région Maritime" fill className="object-cover" priority />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-night-light to-emerald-brand/30" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-night via-night/50 to-transparent" />
         
         <div className="relative h-full max-w-7xl mx-auto px-4 flex flex-col justify-end pb-12">

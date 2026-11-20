@@ -14,6 +14,10 @@
 - Admin : gestionnaire générique (recherche, filtres, actions, messages de correction, notifications) pour utilisateurs, boutiques, produits, catégories, commandes, devises, événements, culture, artisans, guides, avis, signalements, hôtels, restaurants, services, tourisme, bannières, contacts.
 - Espaces professionnels : restaurateur, prestataire, tourisme (création, brouillon, soumission, validation) ; boutique et produits vendeur corrigés.
 - Demandes/devis/réservations visiteur → professionnel, favoris, profil, contact, pages produit, catégories et régions, CGU/confidentialité.
+- Catégories et types gérés depuis l'admin (produits, boutiques, services, tourisme, cuisines, événements, culture) ; plus aucune liste figée dans le code ; détection automatique de la catégorie (mots-clés) et du type de boutique (produits dominants).
+- Plus aucune image dans les fichiers du projet (tout sur Cloudinary).
+- Pages publiques reconstruites : Marketplace, produits, catégories, boutiques & fournisseurs, fiche boutique, services, sites touristiques (recherche, filtres, pagination, favoris, devis).
+- Admin : bouton « Détails » affichant toutes les informations saisies par l'utilisateur.
 - Sécurité : suppression des identifiants de test codés en dur, routes hébergements/admin/seed protégées côté serveur.
 
 ## [1.0.0] - 2026-09-25

@@ -1,3 +1,4 @@
+import { PLACEHOLDER_IMG } from '@/lib/placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { truncate } from '@/lib/utils';
@@ -21,7 +22,7 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 export function HotelCard({ hotel }: Props) {
-  const imageUrl = hotel.images[0]?.secure_url || '/placeholder.jpg';
+  const imageUrl = hotel.images[0]?.secure_url || PLACEHOLDER_IMG;
 
   return (
     <Link href={`/hotels/${hotel.slug}`} prefetch className="group block rounded-xl overflow-hidden border border-gray-100 bg-white hover:shadow-md transition-all duration-200">

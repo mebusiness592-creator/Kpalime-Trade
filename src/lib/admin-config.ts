@@ -92,7 +92,7 @@ export const ADMIN_RESOURCES: Record<string, ResourceCfg> = {
     ],
   },
   categories: {
-    key: 'categories', label: 'Catégories', singular: 'catégorie', canCreate: true, canDelete: true, slugFrom: 'name',
+    key: 'categories', label: 'Catégories de produits', singular: 'catégorie de produits', canCreate: true, canDelete: true, slugFrom: 'name',
     columns: [{ key: 'image', label: 'Image', kind: 'image' }, { key: 'name', label: 'Nom' }, { key: 'slug', label: 'Identifiant' }, { key: 'position', label: 'Ordre' }, { key: 'isActive', label: 'Active', kind: 'bool' }],
     searchFields: ['name', 'slug'],
     fields: [
@@ -133,7 +133,7 @@ export const ADMIN_RESOURCES: Record<string, ResourceCfg> = {
     statuses: [S.pending, { value: 'published', label: 'Publié', cls: 'bg-emerald-500/20 text-emerald-300' }, { value: 'cancelled', label: 'Annulé', cls: 'bg-red-500/20 text-red-300' }, { value: 'finished', label: 'Terminé', cls: 'bg-gray-500/20 text-gray-300' }],
     fields: [
       { name: 'title', label: 'Titre', type: 'text', required: true, col: 2 },
-      { name: 'category', label: 'Type', type: 'select', required: true, options: opt(['concert', 'Concert'], ['festival', 'Festival'], ['exposition', 'Exposition'], ['conference', 'Conférence'], ['sport', 'Sport'], ['culturel', 'Culturel'], ['marche', 'Marché'], ['autre', 'Autre']) },
+      { name: 'category', label: 'Type', type: 'select', required: true, taxonomy: 'event' },
       { name: 'location', label: 'Lieu', type: 'text', required: true }, { name: 'description', label: 'Description', type: 'textarea', required: true, col: 2 },
       { name: 'startDate', label: 'Date de début', type: 'date', required: true }, { name: 'endDate', label: 'Date de fin', type: 'date' },
       { name: 'startTime', label: 'Heure de début', type: 'text' }, { name: 'endTime', label: 'Heure de fin', type: 'text' },
@@ -156,7 +156,7 @@ export const ADMIN_RESOURCES: Record<string, ResourceCfg> = {
     searchFields: ['title', 'excerpt'],
     fields: [
       { name: 'title', label: 'Titre', type: 'text', required: true, col: 2 },
-      { name: 'category', label: 'Rubrique', type: 'select', required: true, options: opt(['histoire', 'Histoire'], ['tradition', 'Tradition'], ['patrimoine', 'Patrimoine'], ['musique', 'Musique'], ['danse', 'Danse'], ['gastronomie', 'Gastronomie'], ['autre', 'Autre']) },
+      { name: 'category', label: 'Rubrique', type: 'select', required: true, taxonomy: 'culture' },
       { name: 'author', label: 'Auteur', type: 'text' }, { name: 'excerpt', label: 'Résumé', type: 'textarea', required: true, col: 2 },
       { name: 'content', label: 'Contenu', type: 'textarea', required: true, col: 2 }, { name: 'coverImage', label: 'Image de couverture', type: 'image' },
       { name: 'isActive', label: 'Publié', type: 'boolean' }, { name: 'isFeatured', label: 'À la une', type: 'boolean' },
@@ -208,6 +208,21 @@ export const ADMIN_RESOURCES: Record<string, ResourceCfg> = {
       { key: 'resolve', label: 'Résolu', tone: 'good', set: { status: 'resolved', resolvedAt: '$now' }, show: is('status', 'new', 'investigating') },
       { key: 'dismiss', label: 'Classer sans suite', tone: 'warn', set: { status: 'dismissed', resolvedAt: '$now' }, show: is('status', 'new', 'investigating') },
     ],
+  },
+  taxonomies: {
+    key: 'taxonomies', label: 'Catégories & types', singular: 'catégorie', canCreate: true, canDelete: true, slugFrom: 'name',
+    description: 'Types de boutiques, catégories de services, de sites touristiques, de cuisines, d’événements… Les utilisateurs les choisissent dans leurs formulaires. (Les catégories de produits sont dans « Catégories de produits ».)',
+    columns: [{ key: 'image', label: 'Image', kind: 'image' }, { key: 'name', label: 'Nom' }, { key: 'kind', label: 'Utilisée pour', kind: 'badge' }, { key: 'slug', label: 'Identifiant' }, { key: 'position', label: 'Ordre' }, { key: 'isActive', label: 'Active', kind: 'bool' }],
+    searchFields: ['name', 'slug'], statusField: 'kind',
+    statuses: [{ value: 'shop', label: 'Types de boutiques', cls: '' }, { value: 'service', label: 'Catégories de services', cls: '' }, { value: 'tourism', label: 'Sites touristiques', cls: '' }, { value: 'restaurant', label: 'Types de cuisine', cls: '' }, { value: 'event', label: 'Types d’événements', cls: '' }, { value: 'culture', label: 'Rubriques culture', cls: '' }],
+    fields: [
+      { name: 'kind', label: 'Utilisée pour', type: 'select', required: true, options: opt(['shop', 'Type de boutique'], ['service', 'Catégorie de service / entreprise'], ['tourism', 'Catégorie de site touristique'], ['restaurant', 'Type de cuisine (restaurant)'], ['event', 'Type d’événement'], ['culture', 'Rubrique culture']) },
+      { name: 'name', label: 'Nom', type: 'text', required: true }, { name: 'position', label: 'Ordre d’affichage', type: 'number' },
+      { name: 'description', label: 'Description', type: 'textarea', col: 2 },
+      { name: 'keywords', label: 'Mots-clés pour la détection automatique', type: 'tags', col: 2, help: 'Ex. pour « Plomberie » : plombier, tuyau, robinet, sanitaire' },
+      { name: 'image', label: 'Image', type: 'image' }, { name: 'isActive', label: 'Active', type: 'boolean' },
+    ],
+    actions: toggleActive.slice(0, 2),
   },
   contact: {
     key: 'contact', label: 'Messages de contact', singular: 'message', canDelete: true,

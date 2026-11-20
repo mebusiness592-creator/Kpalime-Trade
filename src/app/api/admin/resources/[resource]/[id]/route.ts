@@ -30,6 +30,7 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
   const doc = await r.model.findByIdAndUpdate(id, { $set: data }, { new: true });
   if (!doc) return NextResponse.json({ success: false, error: 'Introuvable' }, { status: 404 });
   if (resource === 'banners') revalidateTag('site-config');
+  if (resource === 'taxonomies' || resource === 'categories') revalidateTag('taxonomy');
   await logAdminAction({ adminId: auth.user.userId, action: `${resource}.update`, modelType: resource, modelId: id });
   return NextResponse.json({ success: true, data: doc });
 }
@@ -73,6 +74,7 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
     }
   }
   if (resource === 'banners') revalidateTag('site-config');
+  if (resource === 'taxonomies' || resource === 'categories') revalidateTag('taxonomy');
   await logAdminAction({ adminId: auth.user.userId, action: `${resource}.${action.key}`, modelType: resource, modelId: id, changes: { note, value: body?.value } });
   return NextResponse.json({ success: true, data: doc });
 }
@@ -84,6 +86,7 @@ export async function DELETE(_req: NextRequest, ctx: Ctx) {
   if (!r.cfg.canDelete) return NextResponse.json({ success: false, error: 'Suppression non autorisée' }, { status: 400 });
   await r.model.findByIdAndDelete(id);
   if (resource === 'banners') revalidateTag('site-config');
+  if (resource === 'taxonomies' || resource === 'categories') revalidateTag('taxonomy');
   await logAdminAction({ adminId: auth.user.userId, action: `${resource}.delete`, modelType: resource, modelId: id });
   return NextResponse.json({ success: true });
 }

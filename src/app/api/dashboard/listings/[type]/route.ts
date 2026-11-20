@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireUser } from '@/lib/guards';
 import { LISTING_CONFIG } from '@/lib/listing-config';
-import { LISTING_MODELS, isListingType, sanitizeListing, slugify } from '@/lib/listings';
+import { LISTING_MODELS, isListingType, sanitizeListing, slugify, autoCategory } from '@/lib/listings';
 
 type Ctx = { params: Promise<{ type: string }> };
 
@@ -23,6 +23,7 @@ export async function POST(req: NextRequest, { params }: Ctx) {
   if (!body) return NextResponse.json({ success: false, error: 'Requête invalide' }, { status: 400 });
   const { data, error } = sanitizeListing(type, body);
   if (error || !data) return NextResponse.json({ success: false, error }, { status: 400 });
+  await autoCategory(type, data);
   const submit = body.submit === true;
   const doc = await LISTING_MODELS[type].create({
     ...data, slug: slugify(String(data.name)), ownerId: auth.user.userId,

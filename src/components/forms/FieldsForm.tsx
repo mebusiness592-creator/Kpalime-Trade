@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import type { FieldDef } from '@/lib/listing-config';
 import { ImageField, type GalleryImage } from '@/components/dashboard/ImageField';
 
@@ -10,6 +11,11 @@ const toDateInput = (v: unknown) => (v ? String(v).slice(0, 10) : '');
 
 /** Génère les champs d'un formulaire à partir d'une définition (utilisé par l'espace pro ET l'admin). */
 export function FieldsForm({ fields, values, onChange }: { fields: FieldDef[]; values: Values; onChange: (v: Values) => void }) {
+  const [dyn, setDyn] = useState<Record<string, { value: string; label: string }[]>>({});
+  useEffect(() => {
+    const kinds = Array.from(new Set(fields.filter((f) => f.taxonomy).map((f) => f.taxonomy as string)));
+    kinds.forEach((k) => fetch(`/api/taxonomies?kind=${k}`).then((r) => r.json()).then((r) => r.success && setDyn((d) => ({ ...d, [k]: r.data })))); 
+  }, [fields]);
   const set = (name: string, val: unknown) => onChange({ ...values, [name]: val });
   return (
     <div className="grid sm:grid-cols-2 gap-4">
@@ -21,7 +27,8 @@ export function FieldsForm({ fields, values, onChange }: { fields: FieldDef[]; v
           ) : f.type === 'select' ? (
             <select className={input} value={(values[f.name] as string) ?? ''} onChange={(e) => set(f.name, e.target.value)}>
               <option value="">— Choisir —</option>
-              {f.options?.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              {(f.taxonomy ? (dyn[f.taxonomy] ?? f.options ?? []) : f.options ?? []).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              {f.taxonomy && !(dyn[f.taxonomy] ?? f.options)?.length && <option value="" disabled>Aucune catégorie : demandez à l’administration d’en créer</option>}
             </select>
           ) : f.type === 'image' || f.type === 'gallery' ? (
             <ImageField multiple={f.type === 'gallery'} value={values[f.name] as string | GalleryImage[] | undefined} onChange={(x) => set(f.name, x)} />

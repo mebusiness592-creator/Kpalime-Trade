@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import { APP_NAME, APP_DESCRIPTION } from '@/lib/constants';
 import { getSiteSettings, themeCss } from '@/lib/site-config';
+import { getTaxonomy } from '@/lib/taxonomy';
 import { CurrencyProvider } from '@/context/CurrencyContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
@@ -38,6 +39,7 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const cfg = await getSiteSettings();
+  const cats = await getTaxonomy('product');
   return (
     <html lang="fr" className={inter.className}>
       <head><style dangerouslySetInnerHTML={{ __html: themeCss(cfg) }} /></head>
@@ -46,7 +48,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <CurrencyProvider>
             <CartProvider>
               <ToastProvider>
-                <Header brandName={cfg.brandName} logoUrl={cfg.logoUrl || undefined} announcement={cfg.announcement || undefined} />
+                <Header brandName={cfg.brandName} logoUrl={cfg.logoUrl || undefined} announcement={cfg.announcement || undefined} categories={cats.map((c) => ({ slug: c.slug, label: c.label }))} />
                 <main className="flex-1">
                   <ClientProviders>{children}</ClientProviders>
                 </main>

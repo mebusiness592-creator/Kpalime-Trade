@@ -1,37 +1,43 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import Image from 'next/image';
 import { connectDB } from '@/lib/mongodb';
 import { Shop } from '@/models/Shop';
+import { getTaxonomy } from '@/lib/taxonomy';
+import { getSiteImageMap } from '@/lib/site-images';
+import { shopCategoryMap, pageParams, regex, PAGE_SIZE } from '@/lib/public-data';
+import { PageHero, SearchBar, CategoryChips, EntityCard, Empty, Pager } from '@/components/public/blocks';
 
 export const dynamic = 'force-dynamic';
+export const metadata: Metadata = { title: 'Boutiques & fournisseurs', description: 'Les boutiques et fournisseurs du Togo, classés automatiquement par type de produits.' };
 
-export const metadata: Metadata = { title: 'Boutiques', description: 'Découvrez les boutiques de Kpalimé' };
-
-export default async function ShopsPage() {
+export default async function ShopsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const { q, category, page } = await pageParams(searchParams);
   await connectDB();
-  const shops = await Shop.find({ status: 'approved' }).sort({ isFeatured: -1, name: 1 }).lean();
-
+  const [cats, map, images] = await Promise.all([getTaxonomy('product'), shopCategoryMap(), getSiteImageMap()]);
+  const counts = new Map<string, number>();
+  for (const c of map.values()) counts.set(c, (counts.get(c) ?? 0) + 1);
+  const cat = cats.find((c) => c.slug === category);
+  const filter: Record<string, unknown> = { status: 'approved' };
+  if (q) filter.$or = [{ name: regex(q) }, { description: regex(q) }, { city: regex(q) }];
+  if (cat) filter._id = { $in: [...map].filter(([, c]) => c === cat.value).map(([s]) => s) };
+  const [total, shops] = await Promise.all([
+    Shop.countDocuments(filter),
+    Shop.find(filter).sort({ isFeatured: -1, name: 1 }).skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE).lean(),
+  ]);
+  const label = (id?: string) => cats.find((c) => c.value === id)?.label;
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-      <h1 className="text-2xl font-bold">Boutiques à Kpalimé</h1>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {shops.map((shop) => (
-          <Link key={shop._id.toString()} href={`/shops/${shop.slug}`} prefetch className="block rounded-xl border border-gray-100 bg-white p-4 hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 relative shrink-0">
-                <Image src={shop.logo || '/placeholder.jpg'} alt={shop.name} fill className="object-cover" sizes="48px" />
-              </div>
-              <div>
-                <h2 className="font-bold truncate">{shop.name}</h2>
-                <p className="text-xs text-gray-500 truncate">{shop.city} • {shop.address}</p>
-              </div>
-            </div>
-            <p className="text-sm text-gray-600 line-clamp-2">{shop.description}</p>
-          </Link>
-        ))}
+    <div>
+      <PageHero title="Boutiques & fournisseurs" subtitle="Chaque boutique est rangée automatiquement dans le type correspondant à ses produits (légumes, café, artisanat…)." image={images['page.shops.banner']?.url}>
+        <SearchBar action="/shops" q={q} category={category} placeholder="Rechercher une boutique ou une ville…" />
+      </PageHero>
+      <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
+        <CategoryChips base="/shops" q={q} active={category} items={cats.filter((c) => counts.has(c.value)).map((c) => ({ value: c.slug, label: c.label, count: counts.get(c.value) }))} />
+        {shops.length === 0 ? <Empty text="Aucune boutique ne correspond à votre recherche." cta={{ href: '/auth/register', label: 'Ouvrir ma boutique' }} /> : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {shops.map((s) => <EntityCard key={String(s._id)} href={`/shops/${s.slug}`} image={s.banner || s.logo} title={s.name} subtitle={[s.city, s.district].filter(Boolean).join(' · ')} badge={label(map.get(String(s._id)))} text={s.description} />)}
+          </div>
+        )}
+        <Pager base="/shops" page={page} pages={Math.ceil(total / PAGE_SIZE)} params={{ ...(q ? { q } : {}), ...(category ? { category } : {}) }} />
       </div>
-      {shops.length === 0 && <p className="text-center py-16 text-gray-400">Aucune boutique pour le moment</p>}
     </div>
   );
 }

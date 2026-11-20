@@ -1,3 +1,4 @@
+import { PLACEHOLDER_IMG } from '@/lib/placeholder';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -59,7 +60,7 @@ export default async function VendorProductsPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 relative shrink-0">
-                        <Image src={p.images[0]?.secure_url || '/placeholder.jpg'} alt="" fill className="object-cover" sizes="40px" />
+                        <Image src={p.images[0]?.secure_url || PLACEHOLDER_IMG} alt="" fill className="object-cover" sizes="40px" />
                       </div>
                       <span className="font-medium truncate max-w-[200px]">{p.name}</span>
                     </div>

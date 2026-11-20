@@ -1,3 +1,4 @@
+import { PLACEHOLDER_IMG } from '@/lib/placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { truncate } from '@/lib/utils';
@@ -19,7 +20,7 @@ export function ShopCard({ shop }: Props) {
     <Link href={`/shops/${shop.slug}`} prefetch className="group block p-4 rounded-xl border border-gray-100 bg-white hover:shadow-md transition-all duration-200 space-y-3">
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 relative shrink-0">
-          <Image src={shop.logo || '/placeholder.jpg'} alt={shop.name} fill className="object-cover" sizes="48px" />
+          <Image src={shop.logo || PLACEHOLDER_IMG} alt={shop.name} fill className="object-cover" sizes="48px" />
         </div>
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">

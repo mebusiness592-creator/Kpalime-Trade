@@ -1,3 +1,4 @@
+import { PLACEHOLDER_IMG } from '@/lib/placeholder';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
@@ -36,7 +37,7 @@ export function LazyImage({ src, alt, width, height, fill, className, priority =
       className={cn('object-cover', className)}
       onError={(e) => {
         // Fallback si l'image Cloudinary échoue à charger
-        (e.target as HTMLImageElement).src = '/placeholder.jpg';
+        (e.target as HTMLImageElement).src = PLACEHOLDER_IMG;
       }}
     />
   );

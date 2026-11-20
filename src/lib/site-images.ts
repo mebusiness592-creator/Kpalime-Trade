@@ -1,6 +1,5 @@
 import { connectDB } from '@/lib/mongodb';
 import { SiteImage } from '@/models/SiteImage';
-import { MARKETPLACE_CATEGORIES } from '@/lib/marketplace-categories';
 
 export interface SiteImageSlot {
   key: string;
@@ -21,11 +20,11 @@ const PAGE_BANNERS: [string, string][] = [
 ];
 
 const maritimeLegacy: SiteImageSlot[] = [
-  { key: 'region.maritime.banner', label: 'Maritime : bannière', group: 'Région Maritime', fallback: '/images/discover/regions/maritime/banner-coastline.jpg' },
-  { key: 'region.maritime.lome', label: 'Maritime : galerie – Lomé', group: 'Région Maritime', fallback: '/images/discover/regions/maritime/banner-lome-city.jpg' },
-  { key: 'region.maritime.lake', label: 'Maritime : galerie – lac Togo', group: 'Région Maritime', fallback: '/images/discover/regions/maritime/lake-togo.jpg' },
-  { key: 'region.maritime.culture', label: 'Maritime : galerie – patrimoine', group: 'Région Maritime', fallback: '/images/discover/regions/maritime/cultural-heritage.jpg' },
-  { key: 'region.maritime.hotel', label: 'Maritime : galerie – hôtel', group: 'Région Maritime', fallback: '/images/discover/regions/maritime/hotel-resort.jpg' },
+  { key: 'region.maritime.banner', label: 'Maritime : bannière', group: 'Région Maritime', fallback: '' },
+  { key: 'region.maritime.lome', label: 'Maritime : galerie – Lomé', group: 'Région Maritime', fallback: '' },
+  { key: 'region.maritime.lake', label: 'Maritime : galerie – lac Togo', group: 'Région Maritime', fallback: '' },
+  { key: 'region.maritime.culture', label: 'Maritime : galerie – patrimoine', group: 'Région Maritime', fallback: '' },
+  { key: 'region.maritime.hotel', label: 'Maritime : galerie – hôtel', group: 'Région Maritime', fallback: '' },
   { key: 'region.maritime.card', label: 'Maritime : vignette (page Découvrir)', group: 'Région Maritime', fallback: '' },
 ];
 
@@ -49,7 +48,7 @@ export const SITE_IMAGE_SLOTS: SiteImageSlot[] = [
   { key: 'brand.og', label: 'Image de partage (réseaux sociaux)', group: 'Identité du site', fallback: '' },
   // Accueil
   { key: 'home.univers.marketplace', label: 'Accueil : carte Marketplace', group: 'Accueil', fallback: '' },
-  { key: 'home.univers.explorer', label: 'Accueil : carte Explorer le Togo', group: 'Accueil', fallback: '/images/discover/monuments/carte-togo-regions.jpg' },
+  { key: 'home.univers.explorer', label: 'Accueil : carte Explorer le Togo', group: 'Accueil', fallback: '' },
   { key: 'home.univers.services', label: 'Accueil : carte Entreprises & services', group: 'Accueil', fallback: '' },
   { key: 'home.cta.vendor', label: 'Accueil : appel « Devenir vendeur »', group: 'Accueil', fallback: '' },
   { key: 'home.cta.tourism', label: 'Accueil : appel « Promouvoir mon établissement »', group: 'Accueil', fallback: '' },
@@ -57,11 +56,11 @@ export const SITE_IMAGE_SLOTS: SiteImageSlot[] = [
   { key: 'home.newsletter', label: 'Accueil : fond newsletter', group: 'Accueil', fallback: '' },
   { key: 'footer.bg', label: 'Pied de page : fond', group: 'Identité du site', fallback: '' },
   // Découvrir
-  { key: 'discover.carte', label: 'Découvrir : carte des régions', group: 'Découvrir le Togo', fallback: '/images/discover/monuments/carte-togo-regions.jpg' },
-  { key: 'discover.colonne-lions', label: 'Découvrir : colonne de la Paix (lions)', group: 'Découvrir le Togo', fallback: '/images/discover/monuments/colonne-paix-lions.jpg' },
-  { key: 'discover.drapeau', label: 'Découvrir : drapeau togolais', group: 'Découvrir le Togo', fallback: '/images/discover/monuments/drapeau-togolais-affiche.jpg' },
-  { key: 'discover.colonne-paix', label: 'Découvrir : monuments colonne de la Paix', group: 'Découvrir le Togo', fallback: '/images/discover/monuments/monuments-colonne-paix.jpg' },
-  { key: 'discover.independance', label: 'Découvrir : monument de l’Indépendance', group: 'Découvrir le Togo', fallback: '/images/discover/monuments/monument-independance.jpg' },
+  { key: 'discover.carte', label: 'Découvrir : carte des régions', group: 'Découvrir le Togo', fallback: '' },
+  { key: 'discover.colonne-lions', label: 'Découvrir : colonne de la Paix (lions)', group: 'Découvrir le Togo', fallback: '' },
+  { key: 'discover.drapeau', label: 'Découvrir : drapeau togolais', group: 'Découvrir le Togo', fallback: '' },
+  { key: 'discover.colonne-paix', label: 'Découvrir : monuments colonne de la Paix', group: 'Découvrir le Togo', fallback: '' },
+  { key: 'discover.independance', label: 'Découvrir : monument de l’Indépendance', group: 'Découvrir le Togo', fallback: '' },
   ...['vegetation', 'faune', 'patrimoine', 'gastronomie', 'artisanat'].map((k) => ({ key: `discover.theme.${k}`, label: `Découvrir : thème « ${k} »`, group: 'Découvrir le Togo', fallback: '' })),
   // Régions
   ...regionSlots,
@@ -71,8 +70,6 @@ export const SITE_IMAGE_SLOTS: SiteImageSlot[] = [
   { key: 'auth.register', label: 'Inscription : image latérale', group: 'Bannières des pages', fallback: '' },
   // Types de comptes
   ...['client', 'vendor', 'accommodation_owner', 'restaurant_owner', 'professional', 'tourism_operator'].map((r) => ({ key: `account.${r}`, label: `Type de compte : ${r}`, group: 'Types de comptes', fallback: '' })),
-  // Catégories marketplace
-  ...MARKETPLACE_CATEGORIES.map((c) => ({ key: `marketplace.cat.${c.slug}`, label: `Catégorie : ${c.name}`, group: 'Catégories du Marketplace', fallback: '' })),
   // Tourisme / culture / événements
   ...['cascade', 'montagne', 'foret', 'village', 'marche', 'culturel', 'naturel'].map((c) => ({ key: `tourism.cat.${c}`, label: `Tourisme : catégorie « ${c} »`, group: 'Tourisme', fallback: '' })),
   ...['hotel', 'auberge', 'maison-hotes', 'resort'].map((c) => ({ key: `hotels.type.${c}`, label: `Hébergement : type « ${c} »`, group: 'Hôtels & restaurants', fallback: '' })),

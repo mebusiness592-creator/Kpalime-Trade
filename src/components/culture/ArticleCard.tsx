@@ -1,3 +1,4 @@
+import { PLACEHOLDER_IMG } from '@/lib/placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { truncate, formatDate } from '@/lib/utils';
@@ -24,7 +25,7 @@ export function ArticleCard({ article }: Props) {
     <Link href={`/culture/${article.slug}`} prefetch className="group block rounded-xl overflow-hidden border border-gray-100 bg-white hover:shadow-md transition-all duration-200">
       <div className="relative aspect-[3/2] overflow-hidden bg-gray-100">
         <Image
-          src={article.coverImage || '/placeholder.jpg'}
+          src={article.coverImage || PLACEHOLDER_IMG}
           alt={article.title}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"

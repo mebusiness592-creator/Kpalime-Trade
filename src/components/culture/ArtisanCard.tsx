@@ -1,3 +1,4 @@
+import { PLACEHOLDER_IMG } from '@/lib/placeholder';
 import Image from 'next/image';
 
 interface Props {
@@ -18,7 +19,7 @@ export function ArtisanCard({ artisan }: Props) {
     <div className="p-4 rounded-xl border border-gray-100 bg-white space-y-3 hover:shadow-md transition-all duration-200">
       <div className="flex items-center gap-3">
         <div className="w-14 h-14 rounded-full overflow-hidden bg-gray-100 relative shrink-0">
-          <Image src={artisan.photo || '/placeholder.jpg'} alt={artisan.name} fill className="object-cover" sizes="56px" />
+          <Image src={artisan.photo || PLACEHOLDER_IMG} alt={artisan.name} fill className="object-cover" sizes="56px" />
         </div>
         <div className="min-w-0">
           <h3 className="font-bold truncate">{artisan.name}</h3>

@@ -1,6 +1,6 @@
 /** Configuration isomorphe (client + serveur) des publications professionnelles. */
 export type FieldType = 'text' | 'textarea' | 'select' | 'number' | 'tags' | 'image' | 'gallery' | 'email' | 'boolean' | 'date';
-export interface FieldDef { name: string; label: string; type: FieldType; required?: boolean; options?: { value: string; label: string }[]; help?: string; col?: 1 | 2 }
+export interface FieldDef { name: string; label: string; type: FieldType; required?: boolean; options?: { value: string; label: string }[]; help?: string; col?: 1 | 2; taxonomy?: string }
 
 export type ListingType = 'restaurant' | 'service' | 'tourism';
 
@@ -23,7 +23,7 @@ export const LISTING_CONFIG: Record<ListingType, ListingConfig> = {
     galleryField: 'images', sensitive: ['name', 'description', 'images', 'logo'],
     fields: [
       { name: 'name', label: 'Nom du restaurant', type: 'text', required: true, col: 2 },
-      { name: 'cuisineType', label: 'Type de cuisine', type: 'select', required: true, options: opts(['Togolaise', 'Togolaise'], ['Africaine', 'Africaine'], ['Internationale', 'Internationale'], ['Street-food', 'Street-food'], ['Fruits de mer', 'Fruits de mer'], ['Pâtisserie / café', 'Pâtisserie / café']) },
+      { name: 'cuisineType', label: 'Type de cuisine', type: 'select', required: true, taxonomy: 'restaurant' },
       { name: 'priceRange', label: 'Gamme de prix', type: 'select', options: opts(['budget', 'Économique'], ['mid', 'Intermédiaire'], ['premium', 'Haut de gamme']) },
       { name: 'description', label: 'Présentation', type: 'textarea', required: true, col: 2 },
       { name: 'address', label: 'Adresse', type: 'text', required: true },
@@ -43,7 +43,7 @@ export const LISTING_CONFIG: Record<ListingType, ListingConfig> = {
     galleryField: 'portfolio', sensitive: ['name', 'description', 'portfolio', 'logo'],
     fields: [
       { name: 'name', label: 'Nom de l’entreprise / du prestataire', type: 'text', required: true, col: 2 },
-      { name: 'category', label: 'Catégorie', type: 'select', required: true, options: opts(['Construction & bâtiment', 'Construction & bâtiment'], ['Électricité', 'Électricité'], ['Plomberie', 'Plomberie'], ['Maçonnerie', 'Maçonnerie'], ['Artisanat & ateliers', 'Artisanat & ateliers'], ['Transport & logistique', 'Transport & logistique'], ['Informatique & numérique', 'Informatique & numérique'], ['Services professionnels', 'Services professionnels'], ['Fournisseur d’équipements', 'Fournisseur d’équipements'], ['Commerce', 'Commerce'], ['Autre', 'Autre']) },
+      { name: 'category', label: 'Catégorie de service', type: 'select', taxonomy: 'service', help: 'Laissez vide : la plateforme choisit automatiquement selon votre activité.' },
       { name: 'priceRange', label: 'Tarifs (indicatif)', type: 'text' },
       { name: 'description', label: 'Présentation de l’activité', type: 'textarea', required: true, col: 2 },
       { name: 'skills', label: 'Services / compétences', type: 'tags', help: 'Séparez par des virgules', col: 2 },
@@ -62,7 +62,7 @@ export const LISTING_CONFIG: Record<ListingType, ListingConfig> = {
     galleryField: 'images', sensitive: ['name', 'description', 'shortDescription', 'images'],
     fields: [
       { name: 'name', label: 'Nom du site / de l’activité', type: 'text', required: true, col: 2 },
-      { name: 'category', label: 'Catégorie', type: 'select', required: true, options: opts(['cascade', 'Cascade'], ['montagne', 'Montagne'], ['foret', 'Forêt'], ['village', 'Village'], ['marche', 'Marché'], ['culturel', 'Site culturel'], ['naturel', 'Site naturel']) },
+      { name: 'category', label: 'Catégorie', type: 'select', taxonomy: 'tourism', help: 'Laissez vide : la plateforme choisit automatiquement selon la description.' },
       { name: 'difficulty', label: 'Difficulté', type: 'select', options: opts(['easy', 'Facile'], ['medium', 'Moyenne'], ['hard', 'Difficile']) },
       { name: 'shortDescription', label: 'Résumé (une phrase)', type: 'text', required: true, col: 2 },
       { name: 'description', label: 'Description détaillée', type: 'textarea', required: true, col: 2 },

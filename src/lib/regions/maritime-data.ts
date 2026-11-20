@@ -5,7 +5,7 @@ export const MARITIME_REGION = {
   emoji: '🏖️',
   description:
     'La région Maritime, avec Lomé comme capitale économique, offre des plages, des sites historiques et une vie culturelle dynamique.',
-  banner: '/images/discover/regions/maritime/banner-coastline.jpg',
+  banner: '',
   sections: [
     {
       id: 'destinations',
@@ -75,11 +75,5 @@ export const MARITIME_REGION = {
       ],
     },
   ],
-  gallery: [
-    '/images/discover/regions/maritime/banner-coastline.jpg',
-    '/images/discover/regions/maritime/banner-lome-city.jpg',
-    '/images/discover/regions/maritime/lake-togo.jpg',
-    '/images/discover/regions/maritime/cultural-heritage.jpg',
-    '/images/discover/regions/maritime/hotel-resort.jpg',
-  ],
+  gallery: [],
 };

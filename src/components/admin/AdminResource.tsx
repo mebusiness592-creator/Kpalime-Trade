@@ -10,6 +10,45 @@ type Row = Record<string, unknown> & { _id: string };
 const get = (row: Row, path: string): unknown => path.split('.').reduce<unknown>((o, k) => (o && typeof o === 'object' ? (o as Record<string, unknown>)[k] : undefined), row);
 const TONE: Record<string, string> = { good: 'bg-emerald-600 text-white', bad: 'bg-red-600/80 text-white', warn: 'bg-orange-500/80 text-white', neutral: 'bg-white/10 text-gray-200' };
 
+const HIDDEN = new Set(['__v', 'password']);
+const prettify = (k: string) => k.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
+
+function Val({ v }: { v: unknown }): React.ReactNode {
+  if (v === null || v === undefined || v === '') return <span className="text-gray-600">—</span>;
+  if (typeof v === 'boolean') return v ? 'Oui' : 'Non';
+  if (typeof v === 'string' && /^https:\/\/res\.cloudinary\.com\//.test(v)) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <a href={v} target="_blank" rel="noopener noreferrer"><img src={v} alt="" className="h-24 rounded" /></a>;
+  }
+  if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(v)) return new Date(v).toLocaleString('fr-FR');
+  if (Array.isArray(v)) {
+    if (v.length === 0) return <span className="text-gray-600">—</span>;
+    if (v.every((x) => x && typeof x === 'object' && 'secure_url' in x)) return <div className="flex flex-wrap gap-2">{v.map((x, i) => /* eslint-disable-next-line @next/next/no-img-element */ <img key={i} src={(x as { secure_url: string }).secure_url} alt="" className="h-24 rounded" />)}</div>;
+    if (v.every((x) => typeof x !== 'object')) return v.join(', ');
+    return <div className="space-y-1">{v.map((x, i) => <div key={i} className="rounded bg-white/5 p-2"><Val v={x} /></div>)}</div>;
+  }
+  if (typeof v === 'object') return <div className="space-y-1 pl-3 border-l border-white/10">{Object.entries(v as Record<string, unknown>).filter(([k]) => !HIDDEN.has(k)).map(([k, x]) => <div key={k}><span className="text-gray-400">{prettify(k)} : </span><Val v={x} /></div>)}</div>;
+  return String(v);
+}
+
+/** Fiche complète : tout ce que l'utilisateur a saisi, champ par champ. */
+function DetailModal({ row, cfg, onClose }: { row: Row; cfg: (typeof ADMIN_RESOURCES)[string]; onClose: () => void }) {
+  const labels = Object.fromEntries((cfg.fields ?? []).map((f) => [f.name, f.label]));
+  const entries = Object.entries(row).filter(([k]) => !HIDDEN.has(k));
+  return (
+    <div className="fixed inset-0 z-[60] bg-black/70 overflow-y-auto p-4" onClick={onClose}>
+      <div className="max-w-3xl mx-auto my-6 rounded-xl bg-night-light border border-white/10 p-5" onClick={(e) => e.stopPropagation()}>
+        <div className="flex justify-between items-center mb-4"><h3 className="text-lg font-semibold text-white">Détails complets · {cfg.singular}</h3><button onClick={onClose} className="text-gray-400 hover:text-white text-xl">×</button></div>
+        <dl className="divide-y divide-white/5 text-sm">
+          {entries.map(([k, v]) => (
+            <div key={k} className="grid grid-cols-3 gap-3 py-2"><dt className="text-gray-400">{labels[k] ?? prettify(k)}</dt><dd className="col-span-2 text-gray-100 break-words"><Val v={v} /></dd></div>
+          ))}
+        </dl>
+      </div>
+    </div>
+  );
+}
+
 export function AdminResource({ resource }: { resource: string }) {
   const cfg = ADMIN_RESOURCES[resource];
   const [rows, setRows] = useState<Row[]>([]);
@@ -24,6 +63,7 @@ export function AdminResource({ resource }: { resource: string }) {
   const [noteText, setNoteText] = useState('');
   const [form, setForm] = useState<{ id?: string; values: Values } | null>(null);
   const [saving, setSaving] = useState(false);
+  const [detail, setDetail] = useState<Row | null>(null);
   const base = `/api/admin/resources/${resource}`;
 
   const load = useCallback(async () => {
@@ -116,6 +156,7 @@ export function AdminResource({ resource }: { resource: string }) {
                         <option value="">{a.label}…</option>{a.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                       </select>
                     ) : <button key={a.key} onClick={() => click(row, a)} className={`px-2 py-1 rounded text-xs ${TONE[a.tone || 'neutral']}`}>{a.label}</button>)}
+                    <button onClick={() => setDetail(row)} className="px-2 py-1 rounded text-xs bg-white/15 text-white">Détails</button>
                     {cfg.fields && <button onClick={() => setForm({ id: row._id, values: toFormValues(cfg.fields!, row) })} className="px-2 py-1 rounded text-xs bg-blue-600/70 text-white">Modifier</button>}
                     {cfg.publicPath && typeof row.slug === 'string' && <Link href={`${cfg.publicPath}/${row.slug}`} target="_blank" className="px-2 py-1 rounded text-xs bg-white/10 text-gray-200">Voir</Link>}
                     {cfg.canDelete && <button onClick={() => remove(row)} className="px-2 py-1 rounded text-xs text-red-300 hover:bg-red-500/10">Supprimer</button>}
@@ -137,6 +178,8 @@ export function AdminResource({ resource }: { resource: string }) {
           <button disabled={page >= pages} onClick={() => setPage(page + 1)} className="px-3 py-1.5 rounded bg-white/10 disabled:opacity-40">Suivant</button>
         </div>
       )}
+
+      {detail && <DetailModal row={detail} cfg={cfg} onClose={() => setDetail(null)} />}
 
       {note && (
         <div className="fixed inset-0 z-[60] bg-black/70 flex items-center justify-center p-4">

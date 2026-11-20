@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireUser } from '@/lib/guards';
 import { LISTING_CONFIG } from '@/lib/listing-config';
-import { LISTING_MODELS, isListingType, sanitizeListing } from '@/lib/listings';
+import { LISTING_MODELS, isListingType, sanitizeListing, autoCategory } from '@/lib/listings';
 import { isValidObjectId } from '@/lib/security';
 import { notifyAdmins } from '@/lib/support';
 
@@ -34,6 +34,7 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
   const { data, error } = sanitizeListing(type, body, true);
   if (error || !data) return NextResponse.json({ success: false, error }, { status: 400 });
 
+  await autoCategory(type, data, doc.get('category') && doc.get('category') !== 'autre' ? doc.get('category') : undefined);
   const cfg = LISTING_CONFIG[type];
   const wasLive = doc.status === 'approved';
   const sensitiveChanged = cfg.sensitive.some((k) => k in data && JSON.stringify(data[k] ?? null) !== JSON.stringify(doc.get(k) ?? null));

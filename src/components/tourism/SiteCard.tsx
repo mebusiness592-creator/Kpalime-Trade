@@ -1,3 +1,4 @@
+import { PLACEHOLDER_IMG } from '@/lib/placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { truncate } from '@/lib/utils';
@@ -20,7 +21,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 export function SiteCard({ site }: Props) {
-  const imageUrl = site.images[0]?.secure_url || '/placeholder.jpg';
+  const imageUrl = site.images[0]?.secure_url || PLACEHOLDER_IMG;
 
   return (
     <Link href={`/tourism/${site.slug}`} prefetch className="group block rounded-xl overflow-hidden border border-gray-100 bg-white hover:shadow-md transition-all duration-200">

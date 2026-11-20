@@ -1,15 +1,17 @@
 import Link from 'next/link';
 import { MapPin, Phone, Mail, Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
 import { getSiteSettings } from '@/lib/site-config';
+import { getTaxonomy } from '@/lib/taxonomy';
 
-const COLUMNS = [
-  { title: 'Marketplace', links: [['/marketplace', 'Tous les produits'], ['/marketplace/categories/agriculture-agroalimentaire', 'Agriculture & agroalimentaire'], ['/marketplace/categories/cafe-cacao-produits-agricoles', 'Café & cacao'], ['/marketplace/categories/arts-artisanat', 'Arts & artisanat'], ['/shops', 'Boutiques']] },
+const COLUMNS: { title: string; links: readonly (readonly [string, string])[] }[] = [
+  { title: 'Marketplace', links: [['/marketplace', 'Tous les produits'], ['/shops', 'Boutiques']] },
   { title: 'Explorer le Togo', links: [['/discover', 'Découvrir les régions'], ['/tourism', 'Sites touristiques'], ['/hotels', 'Hôtels & hébergements'], ['/restaurants', 'Restaurants'], ['/events', 'Événements'], ['/culture', 'Culture & artisans']] },
   { title: 'Entreprises & services', links: [['/services', 'Annuaire des professionnels'], ['/auth/register', 'Inscrire mon entreprise'], ['/auth/register', 'Devenir vendeur'], ['/contact', 'Nous contacter'], ['/about', 'À propos']] },
-] as const;
+];
 
 export async function Footer() {
   const s = await getSiteSettings();
+  const cats = await getTaxonomy('product');
   const socials = [[s.facebook, 'Facebook', Facebook], [s.instagram, 'Instagram', Instagram], [s.twitter, 'X', Twitter], [s.youtube, 'YouTube', Youtube]] as const;
   return (
     <footer className="bg-night-deep border-t border-white/10 mt-auto">
@@ -27,7 +29,7 @@ export async function Footer() {
             ))}
           </div>
         </div>
-        {COLUMNS.map((c) => (
+        {COLUMNS.map((c) => c.title === 'Marketplace' ? { ...c, links: [c.links[0], ...cats.slice(0, 4).map((x) => [`/marketplace/categories/${x.slug}`, x.label] as const), ...c.links.slice(1)] } : c).map((c) => (
           <div key={c.title}>
             <h4 className="font-semibold mb-4 text-white">{c.title}</h4>
             <ul className="space-y-2.5">{c.links.map(([href, label]) => <li key={label}><Link href={href} className="text-sm text-muted hover:text-white transition-colors">{label}</Link></li>)}</ul>

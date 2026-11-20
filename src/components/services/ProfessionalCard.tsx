@@ -1,3 +1,4 @@
+import { PLACEHOLDER_IMG } from '@/lib/placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { truncate } from '@/lib/utils';
@@ -20,7 +21,7 @@ export function ProfessionalCard({ professional }: Props) {
     <Link href={`/services/${professional.slug}`} prefetch className="group block p-4 rounded-xl border border-gray-100 bg-white hover:shadow-md transition-all duration-200 space-y-3">
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 relative shrink-0">
-          <Image src={professional.logo || '/placeholder.jpg'} alt={professional.name} fill className="object-cover" sizes="48px" />
+          <Image src={professional.logo || PLACEHOLDER_IMG} alt={professional.name} fill className="object-cover" sizes="48px" />
         </div>
         <div className="min-w-0">
           <h3 className="font-bold truncate group-hover:text-kpalime-green transition-colors">{professional.name}</h3>

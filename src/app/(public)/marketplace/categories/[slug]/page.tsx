@@ -4,70 +4,54 @@ import { notFound } from 'next/navigation';
 import { connectDB } from '@/lib/mongodb';
 import { Category } from '@/models/Category';
 import { Product } from '@/models/Product';
-import { MARKETPLACE_CATEGORIES } from '@/lib/marketplace-categories';
+import { Shop } from '@/models/Shop';
 import { getSiteImageMap } from '@/lib/site-images';
+import { shopCategoryMap, pageParams, PAGE_SIZE } from '@/lib/public-data';
 import { ProductGrid } from '@/components/marketplace/ProductGrid';
+import { PageHero, EntityCard, Pager, Empty } from '@/components/public/blocks';
 
 export const dynamic = 'force-dynamic';
-
-type Props = { params: Promise<{ slug: string }> };
+type Props = { params: Promise<{ slug: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const c = MARKETPLACE_CATEGORIES.find((x) => x.slug === slug);
+  await connectDB();
+  const c = await Category.findOne({ slug }).lean();
   return { title: c?.name ?? 'Catégorie', description: c?.description };
 }
 
-export default async function CategoryPage({ params }: Props) {
+export default async function CategoryPage({ params, searchParams }: Props) {
   const { slug } = await params;
-  const meta = MARKETPLACE_CATEGORIES.find((c) => c.slug === slug);
+  const { page } = await pageParams(searchParams);
   await connectDB();
-  const db = await Category.findOne({ slug }).lean();
-  if (!meta && !db) notFound();
-  const name = meta?.name ?? db!.name;
-  const products = db
-    ? await Product.find({ categoryId: db._id, status: 'active' })
-        .sort({ isFeatured: -1, createdAt: -1 })
-        .limit(48)
-        .lean()
-    : [];
-  const img = (await getSiteImageMap())[`marketplace.cat.${slug}`]?.url;
-
+  const cat = await Category.findOne({ slug, isActive: true }).lean();
+  if (!cat) notFound();
+  const filter = { categoryId: cat._id, status: 'active' };
+  const map = await shopCategoryMap();
+  const shopIds = [...map].filter(([, c]) => c === String(cat._id)).map(([s]) => s);
+  const [total, products, shops, images] = await Promise.all([
+    Product.countDocuments(filter),
+    Product.find(filter).sort({ isFeatured: -1, createdAt: -1 }).skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE).populate('shopId', 'name slug').lean(),
+    Shop.find({ _id: { $in: shopIds }, status: 'approved' }).limit(8).lean(),
+    getSiteImageMap(),
+  ]);
   return (
     <div>
-      <section className="relative isolate overflow-hidden border-b border-white/10">
-        {img && (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
-            src={img}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover -z-10"
-          />
+      <PageHero title={cat.name} subtitle={cat.description} image={images[`marketplace.cat.${slug}`]?.url || cat.image}>
+        <Link href="/marketplace" className="text-sm text-gold hover:underline">← Marketplace</Link>
+      </PageHero>
+      <div className="max-w-7xl mx-auto px-4 py-10 space-y-10">
+        {shops.length > 0 && (
+          <section className="space-y-4">
+            <div className="flex items-end justify-between"><h2 className="text-2xl font-bold text-white">Fournisseurs : {cat.name}</h2><Link href={`/shops?category=${slug}`} className="text-sm text-emerald-light hover:underline">Voir tous →</Link></div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">{shops.map((s) => <EntityCard key={String(s._id)} href={`/shops/${s.slug}`} image={s.logo} title={s.name} subtitle={s.city} text={s.description} />)}</div>
+          </section>
         )}
-        <div className={`${img ? 'bg-black/60' : ''}`}>
-          <div className="max-w-7xl mx-auto px-4 py-14">
-            <Link href="/marketplace" className="text-sm text-emerald-light hover:underline">
-              ← Marketplace
-            </Link>
-            <h1 className="text-3xl md:text-5xl font-bold text-white mt-3">{name}</h1>
-            <p className="text-white/80 mt-3 max-w-2xl">{meta?.description ?? db?.description}</p>
-          </div>
-        </div>
-      </section>
-      <div className="max-w-7xl mx-auto px-4 py-10 space-y-6">
-        <ProductGrid
-          products={JSON.parse(JSON.stringify(products))}
-          emptyMessage="Aucun produit dans cette catégorie pour le moment."
-        />
-        <div className="rounded-xl border border-white/10 bg-night-light p-6 text-center">
-          <p className="text-white font-semibold">Vous produisez ou vendez dans cette catégorie ?</p>
-          <Link
-            href="/auth/register"
-            className="inline-block mt-3 px-5 py-2.5 rounded-md bg-gold text-night font-semibold hover:bg-gold-light"
-          >
-            Publier mes produits
-          </Link>
-        </div>
+        <section className="space-y-4">
+          <h2 className="text-2xl font-bold text-white">Produits ({total})</h2>
+          {total === 0 ? <Empty text="Aucun produit dans cette catégorie pour le moment." cta={{ href: '/auth/register', label: 'Publier mes produits' }} /> : <ProductGrid products={JSON.parse(JSON.stringify(products))} />}
+          <Pager base={`/marketplace/categories/${slug}`} page={page} pages={Math.ceil(total / PAGE_SIZE)} params={{}} />
+        </section>
       </div>
     </div>
   );

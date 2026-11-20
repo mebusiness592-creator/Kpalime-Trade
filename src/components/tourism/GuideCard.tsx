@@ -1,3 +1,4 @@
+import { PLACEHOLDER_IMG } from '@/lib/placeholder';
 import Image from 'next/image';
 
 interface Props {
@@ -19,7 +20,7 @@ export function GuideCard({ guide }: Props) {
     <div className="p-4 rounded-xl border border-gray-100 bg-white space-y-3">
       <div className="flex items-center gap-3">
         <div className="w-14 h-14 rounded-full overflow-hidden bg-gray-100 relative shrink-0">
-          <Image src={guide.photo || '/placeholder.jpg'} alt={guide.name} fill className="object-cover" sizes="56px" />
+          <Image src={guide.photo || PLACEHOLDER_IMG} alt={guide.name} fill className="object-cover" sizes="56px" />
         </div>
         <div>
           <h3 className="font-bold">{guide.name}</h3>

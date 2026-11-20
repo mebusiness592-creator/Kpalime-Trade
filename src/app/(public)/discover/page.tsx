@@ -137,31 +137,31 @@ const DISCOVER_SECTIONS = [
 const SHOWCASE_IMAGES = [
   {
     key: 'discover.carte',
-    src: '/images/discover/monuments/carte-togo-regions.jpg',
+    src: '',
     alt: 'Carte administrative du Togo montrant les 5 régions économiques',
     caption: 'Les 5 régions du Togo',
   },
   {
     key: 'discover.colonne-lions',
-    src: '/images/discover/monuments/colonne-paix-lions.jpg',
+    src: '',
     alt: 'Monument de la Colonne de la Paix à Lomé avec les deux lions blancs',
     caption: 'Colonne de la Paix — Lomé',
   },
   {
     key: 'discover.drapeau',
-    src: '/images/discover/monuments/drapeau-togolais-affiche.jpg',
+    src: '',
     alt: 'Affiche éducative du drapeau togolais',
     caption: 'Le drapeau togolais',
   },
   {
     key: 'discover.colonne-paix',
-    src: '/images/discover/monuments/monuments-colonne-paix.jpg',
+    src: '',
     alt: 'Affiche éducative sur les monuments du Togo',
     caption: 'Monuments du Togo',
   },
   {
     key: 'discover.independance',
-    src: '/images/discover/monuments/monument-independance.jpg',
+    src: '',
     alt: 'Monument de l\'Indépendance du Togo à Lomé',
     caption: 'Monument de l\'Indépendance — Lomé',
   },
@@ -169,7 +169,7 @@ const SHOWCASE_IMAGES = [
 
 export default async function DiscoverTogoPage() {
   const imageMap = await getSiteImageMap();
-  const SHOWCASE = SHOWCASE_IMAGES.map((img) => ({ ...img, src: imageMap[img.key]?.url || img.src, alt: imageMap[img.key]?.alt || img.alt }));
+  const SHOWCASE = SHOWCASE_IMAGES.map((img) => ({ ...img, src: imageMap[img.key]?.url || img.src, alt: imageMap[img.key]?.alt || img.alt })).filter((img) => img.src);
   return (
     <div className="bg-night min-h-screen">
       {/* ============================================
@@ -200,6 +200,7 @@ export default async function DiscoverTogoPage() {
       {/* ============================================
           2. GALERIE VISUELLE — 5 images du Togo
       ============================================ */}
+      {SHOWCASE.length > 0 && (
       <section className="py-12 md:py-16 border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-10">
@@ -234,6 +235,7 @@ export default async function DiscoverTogoPage() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ============================================
           3. LES 5 RÉGIONS DU TOGO — Cartes détaillées

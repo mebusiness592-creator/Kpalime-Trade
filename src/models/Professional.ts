@@ -28,7 +28,7 @@ const schema = new Schema<IProfessional>(
   {
     name: { type: String, required: true, trim: true },
     slug: { type: String, required: true, unique: true },
-    category: { type: String, required: true },
+    category: { type: String, default: 'autre' },
     description: { type: String, required: true },
     logo: { type: String },
     portfolio: [{ public_id: String, secure_url: String }],

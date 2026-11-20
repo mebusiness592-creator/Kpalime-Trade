@@ -38,7 +38,7 @@ const schema = new Schema<ITouristSite>(
     slug: { type: String, required: true, unique: true },
     shortDescription: { type: String, required: true },
     description: { type: String, required: true },
-    category: { type: String, enum: ['cascade', 'montagne', 'foret', 'village', 'marche', 'culturel', 'naturel'], required: true },
+    category: { type: String, default: 'autre' },
     images: [{ public_id: String, secure_url: String }],
     gpsLat: { type: Number },
     gpsLng: { type: Number },

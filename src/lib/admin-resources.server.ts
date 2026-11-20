@@ -15,6 +15,7 @@ import { Accommodation } from '@/models/Accommodation';
 import { Restaurant } from '@/models/Restaurant';
 import { Professional } from '@/models/Professional';
 import { TouristSite } from '@/models/TouristSite';
+import { Taxonomy } from '@/models/Taxonomy';
 import { ContactMessage } from '@/models/ContactMessage';
 import { HeroSlide } from '@/models/HeroSlide';
 import { ADMIN_RESOURCES, type ResourceCfg } from '@/lib/admin-config';
@@ -25,7 +26,7 @@ type AnyModel = Model<any>;
 export const RESOURCE_MODELS: Record<string, AnyModel> = {
   users: User, shops: Shop, products: Product, categories: Category, orders: Order, currencies: Currency, events: Event,
   culture: CulturalArticle, artisans: Artisan, guides: Guide, reviews: Review, reports: Report, hotels: Accommodation,
-  restaurants: Restaurant, services: Professional, tourism: TouristSite, banners: HeroSlide, contact: ContactMessage,
+  restaurants: Restaurant, services: Professional, tourism: TouristSite, banners: HeroSlide, contact: ContactMessage, taxonomies: Taxonomy,
 };
 
 export const RESOURCE_POPULATE: Record<string, { path: string; select: string }[]> = {

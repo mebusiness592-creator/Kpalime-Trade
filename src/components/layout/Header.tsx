@@ -17,9 +17,6 @@ interface NavGroup { label: string; href: string; items: { href: string; label: 
 const NAV: NavGroup[] = [
   { label: 'Marketplace', href: '/marketplace', items: [
     { href: '/marketplace', label: 'Tous les produits', desc: 'Produits locaux, du producteur à l’acheteur' },
-    { href: '/marketplace/categories/agriculture-agroalimentaire', label: 'Agriculture & agroalimentaire', desc: 'Céréales, fruits, produits transformés' },
-    { href: '/marketplace/categories/cafe-cacao-produits-agricoles', label: 'Café, cacao & produits agricoles', desc: 'Les grands produits d’exportation' },
-    { href: '/marketplace/categories/arts-artisanat', label: 'Arts & artisanat', desc: 'Savoir-faire des artisans togolais' },
     { href: '/shops', label: 'Boutiques & fournisseurs', desc: 'Vendeurs et entreprises vérifiés' },
   ] },
   { label: 'Explorer le Togo', href: '/discover', items: [
@@ -38,7 +35,7 @@ const NAV: NavGroup[] = [
   ] },
 ];
 
-export function Header({ brandName, logoUrl, announcement }: { brandName: string; logoUrl?: string; announcement?: string }) {
+export function Header({ brandName, logoUrl, announcement, categories = [] }: { brandName: string; logoUrl?: string; announcement?: string; categories?: { slug: string; label: string }[] }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout, isLoading } = useAuth();
@@ -57,6 +54,7 @@ export function Header({ brandName, logoUrl, announcement }: { brandName: string
 
   const search = (e: React.FormEvent) => { e.preventDefault(); if (q.trim()) { router.push(`/search?q=${encodeURIComponent(q.trim())}`); setQ(''); } };
   const dash = user ? homeForRole(user.role) : '/auth/login';
+  const nav = NAV.map((g) => g.label === 'Marketplace' ? { ...g, items: [g.items[0], ...categories.slice(0, 5).map((c) => ({ href: `/marketplace/categories/${c.slug}`, label: c.label, desc: 'Voir les produits et fournisseurs' })), ...g.items.slice(1)] } : g);
   const isActive = (g: NavGroup) => g.items.some((i) => pathname === i.href || (i.href !== '/' && pathname.startsWith(i.href)));
 
   return (
@@ -72,7 +70,7 @@ export function Header({ brandName, logoUrl, announcement }: { brandName: string
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1 ml-4" aria-label="Navigation principale">
-            {NAV.map((g) => (
+            {nav.map((g) => (
               <div key={g.label} className="relative">
                 <button onClick={() => setOpen(open === g.label ? null : g.label)} onMouseEnter={() => setOpen(g.label)} aria-expanded={open === g.label}
                   className={cn('flex items-center gap-1.5 px-3.5 py-2 rounded-md text-sm font-medium transition-colors', isActive(g) ? 'text-white bg-white/10' : 'text-muted hover:text-white hover:bg-white/5')}>
@@ -138,7 +136,7 @@ export function Header({ brandName, logoUrl, announcement }: { brandName: string
             <Search size={16} className="absolute left-7 top-1/2 -translate-y-[40%] text-muted" />
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Rechercher…" className="w-full pl-9 pr-3 py-2.5 rounded-md bg-night border border-white/10 text-white placeholder-muted text-sm" />
           </form>
-          {NAV.map((g) => (
+          {nav.map((g) => (
             <div key={g.label} className="px-4 py-2">
               <p className="text-xs font-bold uppercase tracking-wider text-gold mb-1">{g.label}</p>
               {g.items.map((it) => <Link key={it.href + it.label} href={it.href} className="block px-3 py-2.5 rounded-md text-sm text-white/90 hover:bg-white/5">{it.label}</Link>)}

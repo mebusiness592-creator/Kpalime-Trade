@@ -34,7 +34,7 @@ export function sanitizeFields(fields: FieldDef[], body: Record<string, unknown>
       case 'text': case 'textarea': case 'email': case 'select': {
         const v = String(raw ?? '').trim().slice(0, f.type === 'textarea' ? 5000 : 300);
         if (f.required && !v) return { error: `${f.label} est obligatoire` };
-        if (f.type === 'select' && v && f.options && !f.options.some((o) => o.value === v)) return { error: `${f.label} : valeur invalide` };
+        if (f.type === 'select' && v && f.options && !f.taxonomy && !f.options.some((o) => o.value === v)) return { error: `${f.label} : valeur invalide` };
         if (f.type === 'email' && v && !/^\S+@\S+\.\S+$/.test(v)) return { error: 'E-mail invalide' };
         out[f.name] = v || undefined; break;
       }
@@ -51,4 +51,12 @@ export function sanitizeFields(fields: FieldDef[], body: Record<string, unknown>
     }
   }
   return { data: out };
+}
+
+/** Si la catégorie est vide, la plateforme la détecte (mots-clés des catégories créées par l'admin). */
+export async function autoCategory(type: ListingType, data: Record<string, unknown>, existing?: unknown): Promise<void> {
+  if (type === 'restaurant' || data.category || existing) return;
+  const { detectCategory } = await import('@/lib/taxonomy');
+  const text = [data.name, data.description, data.shortDescription, ...(Array.isArray(data.skills) ? data.skills : []), ...(Array.isArray(data.activities) ? data.activities : [])].filter(Boolean).join(' ');
+  data.category = (await detectCategory(type === 'service' ? 'service' : 'tourism', text)) ?? 'autre';
 }
